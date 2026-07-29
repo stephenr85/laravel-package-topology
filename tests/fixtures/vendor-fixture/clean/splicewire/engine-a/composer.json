@@ -1,0 +1,1 @@
+{ "name": "splicewire/engine-a", "require": { "php": "^8.3", "splicewire/kernel": "*" } }

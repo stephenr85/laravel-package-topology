@@ -1,0 +1,64 @@
+{
+    "name": "rushing/laravel-package-topology",
+    "description": "A declarative package-topology substrate for Laravel monorepos, riding rushing/laravel-graphine: one TopologyContract spanning two axes — the composer-require graph (direct edges, reachability, layering, cycles) and the source-import boundary (AST namespace guard) — plus a testing kit so a repo declares its architecture instead of hand-rolling fitness tests.",
+    "keywords": ["laravel", "topology", "architecture", "fitness-function", "graph", "composer", "monorepo", "substrate"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Stephen Rushing",
+            "email": "stephenr85@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^8.3",
+        "rushing/laravel-graphine": "dev-main"
+    },
+    "require-dev": {
+        "laravel/pint": "^1.0",
+        "nikic/php-parser": "^5.0",
+        "orchestra/testbench": "^9.0 || ^10.0",
+        "pestphp/pest": "^3.0"
+    },
+    "suggest": {
+        "phpunit/phpunit": "The testing kit (AssertsPackageTopology / PackageTopologyConformance) needs a PHPUnit-providing host.",
+        "nikic/php-parser": "BSD-3 — the AST scanner behind graphine's SeamGuard, used by the source-import axis (sourceNeverReferences)."
+    },
+    "autoload": {
+        "psr-4": {
+            "Rushing\\PackageTopology\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Rushing\\PackageTopology\\Tests\\": "tests/"
+        }
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../laravel-graphine",
+            "options": {
+                "symlink": true
+            }
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Rushing\\PackageTopology\\PackageTopologyServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        },
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "scripts": {
+        "pint": "@php -d memory_limit=512M vendor/bin/pint",
+        "test": "@php vendor/bin/pest"
+    }
+}
