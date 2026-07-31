@@ -75,6 +75,50 @@ exploding the reachability queries. Keep it tight.
 For a host with no base-class constraint, extend `PackageTopologyConformance` instead of using the trait —
 it ships a ready `test_topology_holds()` off the same two seams.
 
+## Declared manifests — let the packages own their own rules
+
+Hand-declaring the whole contract in one consumer works, but every consumer then re-copies (and drifts
+from) the same edges. The **declared-manifest** mode moves each rule to the package it is *about*: a
+package states its own invariants in its `composer.json` `extra.package-topology` block, and the consumer
+runs one thin test that merges whatever the installed tree declares — it declares nothing itself. This is
+the "doctor / install-manifest" pattern applied to topology; correcting a direction is a one-line edit in
+the owning package, and every consumer follows.
+
+The rule keys are the builder-method names verbatim (subject = the declaring package):
+
+```jsonc
+// splicewire/laravel-beam  composer.json
+"extra": {
+    "package-topology": {
+        "because": "the ADR-0138 diamond",
+        "mustRequire": ["schemastud/laravel-frame"],
+        "mustNotRequire": ["splicewire/laravel-satellite*"],   // glob → expanded against the installed set
+        "policy": {                                            // estate-wide prefix rules (no single owner)
+            "noRequire": [
+                { "fromPrefix": "schemastud/", "toPrefix": "splicewire/", "exceptPrefix": "splicewire/laravel-beam" }
+            ]
+        }
+    }
+}
+```
+
+Also supported: `neverReaches`, `downOnly` (the from-list), `mustBeInstalled`, `sourceNeverReferences`
+(prefixes). `mustBeAcyclic` is always appended. Consume it with the trait / base:
+
+```php
+final class DeclaredTopologyTest extends \Tests\TestCase
+{
+    use \Rushing\PackageTopology\Testing\AssertsDeclaredTopology;
+
+    protected function vendorPath(): string { return base_path('vendor'); }
+
+    public function test_the_declared_topology_holds(): void { $this->assertDeclaredTopologyHolds(); }
+}
+```
+
+`AssertsDeclaredTopology` widens the default scope to `schemastud/*` too (the open foundation
+participates in the vendor-seam rules). `DeclaredTopologyConformance` is the base-class variant.
+
 ## Rule reference
 
 | Builder call | Meaning | Check |

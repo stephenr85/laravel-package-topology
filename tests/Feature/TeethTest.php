@@ -23,7 +23,7 @@ function evaluate(TopologyContract $contract, string $vendorPath): array
     return (new TopologyEvaluator)->evaluate($contract, $store, $vendorPath);
 }
 
-function fixture(string $relative): string
+function teethFixture(string $relative): string
 {
     return __DIR__.'/../fixtures/'.$relative;
 }
@@ -39,7 +39,7 @@ test('a clean direct-edge contract holds against the clean fixture tree', functi
         ->mustRequire('splicewire/kernel', 'rushing/lib')
         ->build();
 
-    expect(evaluate($contract, fixture('vendor-fixture/clean')))->toBe([]);
+    expect(evaluate($contract, teethFixture('vendor-fixture/clean')))->toBe([]);
 });
 
 test('a forbidden direct edge that actually exists is caught', function () {
@@ -48,7 +48,7 @@ test('a forbidden direct edge that actually exists is caught', function () {
         ->mustNotRequire('splicewire/engine-a', 'splicewire/kernel', because: 'planted violation')
         ->build();
 
-    $violations = evaluate($contract, fixture('vendor-fixture/clean'));
+    $violations = evaluate($contract, teethFixture('vendor-fixture/clean'));
 
     expect($violations)->not->toBe([])
         ->and($violations[0]->kind)->toBe(RuleKind::ForbiddenDirectEdge)
@@ -62,7 +62,7 @@ test('a required direct edge that is missing is caught', function () {
         ->mustRequire('splicewire/engine-a', 'splicewire/spine')
         ->build();
 
-    $violations = evaluate($contract, fixture('vendor-fixture/clean'));
+    $violations = evaluate($contract, teethFixture('vendor-fixture/clean'));
 
     expect($violations)->not->toBe([])
         ->and($violations[0]->kind)->toBe(RuleKind::RequiredDirectEdge);
@@ -78,7 +78,7 @@ test('transitive rules (neverReaches / downOnly / layerOrder) hold on the clean 
         ->mustBeAcyclic()
         ->build();
 
-    expect(evaluate($contract, fixture('vendor-fixture/clean')))->toBe([]);
+    expect(evaluate($contract, teethFixture('vendor-fixture/clean')))->toBe([]);
 });
 
 test('downOnly is caught when a package depends UP', function () {
@@ -89,7 +89,7 @@ test('downOnly is caught when a package depends UP', function () {
         ->downOnly('splicewire/kernel', from: ['splicewire/spine'], because: 'planted upward claim')
         ->build();
 
-    $violations = evaluate($contract, fixture('vendor-fixture/clean'));
+    $violations = evaluate($contract, teethFixture('vendor-fixture/clean'));
 
     expect($violations)->not->toBe([])
         ->and($violations[0]->kind)->toBe(RuleKind::DownOnly)
@@ -102,7 +102,7 @@ test('neverReaches is caught on a transitive path', function () {
         ->neverReaches('splicewire/engine-a', 'splicewire/spine')
         ->build();
 
-    $violations = evaluate($contract, fixture('vendor-fixture/clean'));
+    $violations = evaluate($contract, teethFixture('vendor-fixture/clean'));
 
     expect($violations)->not->toBe([])
         ->and($violations[0]->kind)->toBe(RuleKind::ForbiddenReachable);
@@ -111,16 +111,16 @@ test('neverReaches is caught on a transitive path', function () {
 test('a require cycle is caught by mustBeAcyclic and passes on the acyclic tree', function () {
     $contract = TopologyContract::for('cycle')->mustBeAcyclic()->build();
 
-    $violations = evaluate($contract, fixture('vendor-fixture/cyclic'));
+    $violations = evaluate($contract, teethFixture('vendor-fixture/cyclic'));
     expect($violations)->not->toBe([])
         ->and($violations[0]->kind)->toBe(RuleKind::Acyclic)
         ->and($violations[0]->message())->toContain('cyc-a');
 
-    expect(evaluate($contract, fixture('vendor-fixture/clean')))->toBe([]);
+    expect(evaluate($contract, teethFixture('vendor-fixture/clean')))->toBe([]);
 });
 
 test('a required-but-absent phantom is caught by mustBeInstalled, and its edge is kept', function () {
-    $vendorPath = fixture('vendor-fixture/phantom');
+    $vendorPath = teethFixture('vendor-fixture/phantom');
 
     // The ghost has no manifest → mustBeInstalled fails.
     $installed = TopologyContract::for('phantom-installed')
@@ -146,7 +146,7 @@ test('a required-but-absent phantom is caught by mustBeInstalled, and its edge i
 // --- source-import axis (ticket 03) -----------------------------------------
 
 test('sourceNeverReferences catches an upward namespace reference and passes on the clean source', function () {
-    $vendorPath = fixture('src-fixture');
+    $vendorPath = teethFixture('src-fixture');
 
     $leaky = TopologyContract::for('leaky-src')
         ->sourceNeverReferences('leaky', prefixes: ['Splicewire\\SomeEngine\\'], because: 'engine→spine direction must not invert')
@@ -167,5 +167,5 @@ test('sourceNeverReferences skips gracefully when a package src/ is absent', fun
         ->sourceNeverReferences('does-not-exist', prefixes: ['Splicewire\\SomeEngine\\'])
         ->build();
 
-    expect(evaluate($contract, fixture('src-fixture')))->toBe([]);
+    expect(evaluate($contract, teethFixture('src-fixture')))->toBe([]);
 });

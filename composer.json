@@ -17,7 +17,7 @@
         "laravel/pint": "^1.0",
         "nikic/php-parser": "^5.0",
         "orchestra/testbench": "^9.0 || ^10.0",
-        "pestphp/pest": "^3.0"
+        "pestphp/pest": "^4.0"
     },
     "suggest": {
         "phpunit/phpunit": "The testing kit (AssertsPackageTopology / PackageTopologyConformance) needs a PHPUnit-providing host.",
