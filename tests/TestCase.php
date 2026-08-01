@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Rushing\PackageTopology\Tests;
 
 use Orchestra\Testbench\TestCase as Orchestra;

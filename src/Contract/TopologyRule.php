@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Rushing\PackageTopology\Contract;
 
 use Rushing\PackageTopology\Evaluator\TopologyEvaluator;
@@ -20,7 +18,7 @@ use Rushing\PackageTopology\Evaluator\TopologyEvaluator;
  *     (the forbidden namespace prefixes).
  *   - `mustBeInstalled` uses {@see $subject}; `mustBeAcyclic` uses none.
  */
-final readonly class TopologyRule
+class TopologyRule
 {
     /**
      * @param  list<string>  $targets  from-list (downOnly), layers (layerOrder), or prefixes (sourceNeverReferences)

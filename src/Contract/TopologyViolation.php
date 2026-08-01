@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Rushing\PackageTopology\Contract;
 
 /**
@@ -10,7 +8,7 @@ namespace Rushing\PackageTopology\Contract;
  * package pair, a package + file, or just a package), and the declared `because`
  * rationale so a failing suite reads as a hierarchy statement, not a stack trace.
  */
-final readonly class TopologyViolation
+class TopologyViolation
 {
     public function __construct(
         public RuleKind $kind,

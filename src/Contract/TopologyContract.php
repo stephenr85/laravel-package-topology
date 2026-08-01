@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Rushing\PackageTopology\Contract;
 
 use Rushing\PackageTopology\Evaluator\TopologyEvaluator;
@@ -28,7 +26,7 @@ use Rushing\PackageTopology\Testing\AssertsPackageTopology;
  * the {@see AssertsPackageTopology} kit wires a
  * source + driver and asserts the contract holds against the real installed tree.
  */
-final readonly class TopologyContract
+class TopologyContract
 {
     /**
      * @param  list<TopologyRule>  $rules

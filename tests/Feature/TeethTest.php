@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 use Rushing\Graphine\Drivers\RelationalDriverFactory;
 use Rushing\PackageTopology\Contract\RuleKind;
 use Rushing\PackageTopology\Contract\TopologyContract;

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Rushing\PackageTopology;
 
 use Illuminate\Support\ServiceProvider;
@@ -12,7 +10,7 @@ use Illuminate\Support\ServiceProvider;
  * the package auto-discovers cleanly under Laravel's package convention and has a
  * home for any future wiring.
  */
-final class PackageTopologyServiceProvider extends ServiceProvider
+class PackageTopologyServiceProvider extends ServiceProvider
 {
     public function register(): void
     {

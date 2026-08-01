@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Rushing\PackageTopology\Sources;
 
 use Rushing\Graphine\Contracts\GraphSource;
@@ -34,7 +32,7 @@ use Rushing\Graphine\Dto\NodeId;
  * Pure filesystem: it reads `vendor/{vendor}/{name}/composer.json`, no DB, no
  * Splicewire vocabulary. Spine-only — it declares no governance gates.
  */
-final class ComposerManifestGraphSource implements GraphSource
+class ComposerManifestGraphSource implements GraphSource
 {
     /** @var array<string,array<string,mixed>>|null memoised name => manifest for installed in-scope packages */
     private ?array $manifests = null;
@@ -45,9 +43,9 @@ final class ComposerManifestGraphSource implements GraphSource
      * @param  list<string>  $requireKeys  manifest keys to read edges from (opt in 'require-dev')
      */
     public function __construct(
-        private readonly string $vendorPath,
-        private readonly array $include = ['rushing/*', 'splicewire/*'],
-        private readonly array $requireKeys = ['require'],
+        private string $vendorPath,
+        private array $include = ['rushing/*', 'splicewire/*'],
+        private array $requireKeys = ['require'],
     ) {}
 
     /** @return iterable<Node> */

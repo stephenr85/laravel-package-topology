@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Rushing\PackageTopology\Tests\Feature;
 
 use Rushing\PackageTopology\Contract\TopologyContract;
@@ -14,7 +12,7 @@ use Rushing\PackageTopology\Tests\TestCase;
  * fixture tree, proving a consumer wires the whole spine with two seams and one
  * `assertTopologyHolds()` call — both axes in one contract.
  */
-final class KitConsumerTest extends TestCase
+class KitConsumerTest extends TestCase
 {
     use AssertsPackageTopology;
 

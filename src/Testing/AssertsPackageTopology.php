@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Rushing\PackageTopology\Testing;
 
 use Rushing\Graphine\Drivers\RelationalDriverFactory;
@@ -19,7 +17,7 @@ use Rushing\PackageTopology\Sources\ComposerManifestGraphSource;
  * never extend (PHP is single-inheritance). The consumer fills two seams and
  * calls one assertion:
  *
- *   final class MyHierarchyTest extends \Tests\TestCase
+ *   class MyHierarchyTest extends \Tests\TestCase
  *   {
  *       use AssertsPackageTopology;
  *

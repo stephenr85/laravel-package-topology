@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Rushing\PackageTopology\Evaluator;
 
 use Rushing\Graphine\Contracts\ComputeStore;
@@ -33,7 +31,7 @@ use Rushing\PackageTopology\Contract\TopologyViolation;
  *   mustBeInstalled  → getNode(pkg)?->properties['installed'] === true
  *   sourceNeverReferences → (new SeamGuard(prefixes))->scan(vendor/{pkg}/src) === []
  */
-final class TopologyEvaluator
+class TopologyEvaluator
 {
     /**
      * @param  string  $vendorPath  the vendor root, used to locate `vendor/{pkg}/src` for source rules
