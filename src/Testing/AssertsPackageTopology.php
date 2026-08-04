@@ -2,7 +2,7 @@
 
 namespace Rushing\PackageTopology\Testing;
 
-use Rushing\Graphine\Laravel\Drivers\RelationalDriverFactory;
+use Rushing\Graphine\Drivers\RelationalDriverFactory;
 use Rushing\PackageTopology\Contract\TopologyContract;
 use Rushing\PackageTopology\Contract\TopologyViolation;
 use Rushing\PackageTopology\Evaluator\TopologyEvaluator;

@@ -19,7 +19,7 @@ The seam it composes on:
 
 - `Sources\ComposerManifestGraphSource implements Rushing\Graphine\Contracts\GraphSource` — reads scoped
   `vendor/{pkg}/composer.json` `require` keys into `Node`/`Edge`.
-- `Rushing\Graphine\Laravel\Drivers\RelationalDriverFactory::make($source)` hydrates the source into the in-memory
+- `Rushing\Graphine\Drivers\RelationalDriverFactory::make($source)` hydrates the source into the in-memory
   spine **once**; the evaluator answers every read from that snapshot.
 - Direct-edge rules use `neighbours(…, Descendants, maxDepth: 1)`; reachability uses `shortestPath`; cycles
   use `detectCycles`.

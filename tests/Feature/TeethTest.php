@@ -1,6 +1,6 @@
 <?php
 
-use Rushing\Graphine\Laravel\Drivers\RelationalDriverFactory;
+use Rushing\Graphine\Drivers\RelationalDriverFactory;
 use Rushing\PackageTopology\Contract\RuleKind;
 use Rushing\PackageTopology\Contract\TopologyContract;
 use Rushing\PackageTopology\Contract\TopologyViolation;

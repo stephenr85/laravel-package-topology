@@ -1,6 +1,6 @@
 {
-    "name": "rushing/laravel-package-topology",
-    "description": "A declarative package-topology substrate for Laravel monorepos, riding rushing/laravel-graphine: one TopologyContract spanning two axes — the composer-require graph (direct edges, reachability, layering, cycles) and the source-import boundary (AST namespace guard) — plus a testing kit so a repo declares its architecture instead of hand-rolling fitness tests.",
+    "name": "rushing/php-package-topology",
+    "description": "A declarative package-topology substrate for composer monorepos, riding rushing/php-graphine: one TopologyContract spanning two axes — the composer-require graph (direct edges, reachability, layering, cycles) and the source-import boundary (AST namespace guard) — plus a testing kit so a repo declares its architecture instead of hand-rolling fitness tests.",
     "keywords": ["laravel", "topology", "architecture", "fitness-function", "graph", "composer", "monorepo", "substrate"],
     "license": "MIT",
     "authors": [
@@ -11,12 +11,11 @@
     ],
     "require": {
         "php": "^8.3",
-        "rushing/laravel-graphine": "dev-main"
+        "rushing/php-graphine": "dev-main"
     },
     "require-dev": {
         "laravel/pint": "^1.0",
         "nikic/php-parser": "^5.0",
-        "orchestra/testbench": "^9.0 || ^10.0",
         "pestphp/pest": "^4.0"
     },
     "suggest": {
@@ -36,19 +35,12 @@
     "repositories": [
         {
             "type": "path",
-            "url": "../laravel-graphine",
+            "url": "../php-graphine",
             "options": {
                 "symlink": true
             }
         }
     ],
-    "extra": {
-        "laravel": {
-            "providers": [
-                "Rushing\\PackageTopology\\PackageTopologyServiceProvider"
-            ]
-        }
-    },
     "config": {
         "allow-plugins": {
             "pestphp/pest-plugin": true

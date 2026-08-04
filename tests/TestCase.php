@@ -2,16 +2,16 @@
 
 namespace Rushing\PackageTopology\Tests;
 
-use Orchestra\Testbench\TestCase as Orchestra;
-use Rushing\PackageTopology\PackageTopologyServiceProvider;
+use PHPUnit\Framework\TestCase as BaseTestCase;
 
-abstract class TestCase extends Orchestra
+/**
+ * The framework-free base for php-package-topology's suite. The substrate is a
+ * test-time architectural-fitness kit that reads composer manifests and package
+ * source over an in-memory graph — no Laravel container is needed, so a plain
+ * PHPUnit TestCase backs the whole suite.
+ */
+abstract class TestCase extends BaseTestCase
 {
-    protected function getPackageProviders($app): array
-    {
-        return [PackageTopologyServiceProvider::class];
-    }
-
     /** Absolute path to a fixture subtree under tests/fixtures. */
     protected function fixturePath(string $relative = ''): string
     {
