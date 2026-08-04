@@ -112,7 +112,7 @@ test('a declared sourceNeverReferences is assembled (and skips gracefully with n
     // With no src/ dir the source rule skips rather than false-failing — so a
     // manifest that declares it still yields a clean run on a src-less tree.
     $tree = declaredVendorTree([
-        'splicewire/laravel-circuit-spine-data' => [
+        'splicewire/laravel-circuit-spine' => [
             'topology' => ['sourceNeverReferences' => ['Splicewire\\Circuits\\Execution\\']],
         ],
     ]);
