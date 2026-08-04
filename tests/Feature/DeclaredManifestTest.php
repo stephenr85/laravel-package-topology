@@ -1,6 +1,6 @@
 <?php
 
-use Rushing\Graphine\Drivers\RelationalDriverFactory;
+use Rushing\Graphine\Laravel\Drivers\RelationalDriverFactory;
 use Rushing\PackageTopology\Contract\RuleKind;
 use Rushing\PackageTopology\Evaluator\TopologyEvaluator;
 use Rushing\PackageTopology\Sources\ComposerManifestGraphSource;
