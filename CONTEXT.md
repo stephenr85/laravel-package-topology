@@ -41,7 +41,9 @@ _Avoid_: policy, ruleset (the contract is the whole declaration, not a bag of ru
 
 **Rule / RuleKind**:
 One declared expectation and its kind. The kinds:
-`mustRequire`/`mustNotRequire` (direct edge, one hop), `neverReaches` (transitive), `downOnly` (never
+`mustRequire`/`mustNotRequire` (direct edge, one hop), `mustRequireDev` (a DEV-only edge — asserted
+against the declaring package's `require-dev` rather than the runtime `require` graph, read straight off
+the manifest like the source axis), `neverReaches` (transitive), `downOnly` (never
 depends UP on a listed tier), `layerOrder` (no lower tier reaches a higher one), `mustBeAcyclic`,
 `mustBeInstalled` (a required-but-absent phantom fails), and `sourceNeverReferences` (the source axis).
 _Avoid_: assertion (that's the test-side act; a rule is the declared expectation).

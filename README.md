@@ -19,7 +19,7 @@ tree.**
 
 | Axis | What it reads | Rules |
 |------|---------------|-------|
-| **Package-graph** | `vendor/{pkg}/composer.json` `require` keys, as a graphine graph | `mustRequire` / `mustNotRequire` (direct edge), `neverReaches` / `downOnly` / `layerOrder` (transitive, via `shortestPath`), `mustBeAcyclic` (`detectCycles`), `mustBeInstalled` (phantom node) |
+| **Package-graph** | `vendor/{pkg}/composer.json` `require` keys, as a graphine graph | `mustRequire` / `mustNotRequire` (direct edge), `mustRequireDev` (DEV-only edge, asserted off-graph against `require-dev`), `neverReaches` / `downOnly` / `layerOrder` (transitive, via `shortestPath`), `mustBeAcyclic` (`detectCycles`), `mustBeInstalled` (phantom node) |
 | **Source-import** | a package's `src/` (parsed AST) | `sourceNeverReferences` — delegates to graphine's `SeamGuard`, stronger than a substring scan (ignores strings/comments) |
 
 ## Install
@@ -92,6 +92,7 @@ The rule keys are the builder-method names verbatim (subject = the declaring pac
     "package-topology": {
         "because": "the ADR-0138 diamond",
         "mustRequire": ["schemastud/laravel-frame"],
+        "mustRequireDev": ["rushing/laravel-surgeon"],         // DEV-only edge — asserted against require-dev
         "mustNotRequire": ["splicewire/laravel-satellite*"],   // glob → expanded against the installed set
         "policy": {                                            // estate-wide prefix rules (no single owner)
             "noRequire": [
@@ -124,6 +125,7 @@ participates in the vendor-seam rules). `DeclaredTopologyConformance` is the bas
 | Builder call | Meaning | Check |
 |---|---|---|
 | `mustRequire($a, $b)` | `$a` requires `$b` directly | `neighbours($a, Descendants, maxDepth: 1)` contains `$b` |
+| `mustRequireDev($a, $b)` | `$a` requires `$b` in `require-dev` (DEV-only edge) | `vendor/$a/composer.json`'s `require-dev` contains `$b` (read off-graph — the graph is runtime-`require` only) |
 | `mustNotRequire($a, $b)` | `$a` must not require `$b` directly | `neighbours(…, maxDepth: 1)` excludes `$b` |
 | `neverReaches($a, $b)` | no transitive require path `$a → … → $b` | `shortestPath($a, $b) === null` |
 | `downOnly($pkg, from: […])` | `$pkg` never depends UP on any listed tier | each: `shortestPath($pkg, $tier) === null` |

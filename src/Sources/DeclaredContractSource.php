@@ -26,7 +26,8 @@ use Rushing\PackageTopology\Contract\TopologyContract;
  *   "extra": {
  *       "package-topology": {
  *           "because": "the ADR-0138 diamond",           // optional, applied to this fragment's rules
- *           "mustRequire":  ["schemastud/laravel-frame"], // self mustRequire X (exact)
+ *           "mustRequire":  ["schemastud/laravel-frame"], // self mustRequire X (exact, runtime require)
+ *           "mustRequireDev": ["rushing/laravel-surgeon"], // self mustRequire X in require-dev (DEV-only edge)
  *           "mustNotRequire": ["splicewire/laravel-satellite*"], // self mustNotRequire X (glob -> installed)
  *           "neverReaches": ["some/upper-tier"],          // self neverReaches X
  *           "downOnly":     ["splicewire/laravel-composition-engine"], // self depends DOWN only, from [...]
@@ -83,6 +84,9 @@ class DeclaredContractSource
 
             foreach ($this->stringList($decl['mustRequire'] ?? null) as $object) {
                 $contract = $contract->mustRequire($self, $object, $because);
+            }
+            foreach ($this->stringList($decl['mustRequireDev'] ?? null) as $object) {
+                $contract = $contract->mustRequireDev($self, $object, $because);
             }
             foreach ($this->stringList($decl['mustNotRequire'] ?? null) as $pattern) {
                 foreach ($this->expand($pattern, $names, $self) as $object) {

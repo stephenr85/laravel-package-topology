@@ -15,13 +15,18 @@ use Rushing\PackageTopology\Sources\ComposerManifestGraphSource;
  *     {@see self::SourceNeverReferences}. Answered by graphine's AST `SeamGuard`.
  *
  * Direct-edge rules ({@see self::RequiredDirectEdge}/{@see self::ForbiddenDirectEdge})
- * are a *direct* `require` claim (one hop, `maxDepth: 1`); the reachability kinds
+ * are a *direct* `require` claim (one hop, `maxDepth: 1`). {@see self::RequiredDevDirectEdge}
+ * is the DEV-ONLY parallel: it asserts the edge lives in the declaring package's
+ * `require-dev`, not its runtime `require` — read straight from the manifest
+ * (`vendor/{pkg}/composer.json`) rather than the require-only package graph, the
+ * same off-graph seam {@see self::SourceNeverReferences} uses. The reachability kinds
  * ({@see self::ForbiddenReachable}/{@see self::DownOnly}/{@see self::LayerOrder})
  * are transitive (`shortestPath`); {@see self::Acyclic} is `detectCycles`.
  */
 enum RuleKind: string
 {
     case RequiredDirectEdge = 'required_direct_edge';
+    case RequiredDevDirectEdge = 'required_dev_direct_edge';
     case ForbiddenDirectEdge = 'forbidden_direct_edge';
     case ForbiddenReachable = 'forbidden_reachable';
     case DownOnly = 'down_only';

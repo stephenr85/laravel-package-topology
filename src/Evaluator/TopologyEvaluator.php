@@ -23,6 +23,7 @@ use Rushing\PackageTopology\Contract\TopologyViolation;
  *
  * Rule → graphine query:
  *   mustRequire      → neighbours(a, Descendants, maxDepth: 1) contains b
+ *   mustRequireDev   → vendor/a/composer.json['require-dev'] contains b (off-graph)
  *   mustNotRequire   → neighbours(a, Descendants, maxDepth: 1) excludes b
  *   neverReaches     → shortestPath(a, b) === null
  *   downOnly         → each from: shortestPath(pkg, from) === null
@@ -54,6 +55,7 @@ class TopologyEvaluator
     {
         return match ($rule->kind) {
             RuleKind::RequiredDirectEdge => $this->requiredDirectEdge($rule, $store),
+            RuleKind::RequiredDevDirectEdge => $this->requiredDevDirectEdge($rule, $vendorPath),
             RuleKind::ForbiddenDirectEdge => $this->forbiddenDirectEdge($rule, $store),
             RuleKind::ForbiddenReachable => $this->forbiddenReachable($rule, $store),
             RuleKind::DownOnly => $this->downOnly($rule, $store),
@@ -74,6 +76,35 @@ class TopologyEvaluator
         }
 
         return [$this->violation($rule, "{$rule->subject} must require {$rule->object} directly, but does not")];
+    }
+
+    /**
+     * The DEV-ONLY parallel of {@see self::requiredDirectEdge}. The package graph
+     * is hydrated from runtime `require` only, so a `require-dev` edge is invisible
+     * to it — this rule instead reads the declaring package's manifest straight off
+     * disk (`vendor/{pkg}/composer.json`) and asserts the edge is present in its
+     * `require-dev`. Same off-graph seam {@see self::sourceNeverReferences} uses,
+     * and it stays graceful when the manifest is missing (a slim CI matrix).
+     *
+     * @return list<TopologyViolation>
+     */
+    private function requiredDevDirectEdge(TopologyRule $rule, string $vendorPath): array
+    {
+        $pkg = (string) $rule->subject;
+        $manifestPath = rtrim($vendorPath, '/')."/{$pkg}/composer.json";
+
+        if (! is_file($manifestPath)) {
+            return [];
+        }
+
+        $decoded = json_decode((string) @file_get_contents($manifestPath), true);
+        $devRequires = is_array($decoded) ? array_keys((array) ($decoded['require-dev'] ?? [])) : [];
+
+        if (in_array($rule->object, $devRequires, true)) {
+            return [];
+        }
+
+        return [$this->violation($rule, "{$rule->subject} must require {$rule->object} as a DEV dependency (require-dev), but does not")];
     }
 
     /** @return list<TopologyViolation> */

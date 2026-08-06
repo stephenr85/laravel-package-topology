@@ -49,6 +49,17 @@ class TopologyContract
         return $this->withRule(new TopologyRule(RuleKind::RequiredDirectEdge, $a, $b, [], $because));
     }
 
+    /**
+     * `$a`'s composer manifest must `require-dev` `$b` directly (a DEV-ONLY edge —
+     * dev tooling `$a` pulls in only for its own test/CI, never at runtime). Its
+     * absence from `require-dev` is the failure; presence in runtime `require`
+     * alone does not satisfy it.
+     */
+    public function mustRequireDev(string $a, string $b, ?string $because = null): self
+    {
+        return $this->withRule(new TopologyRule(RuleKind::RequiredDevDirectEdge, $a, $b, [], $because));
+    }
+
     /** `$a`'s composer manifest must NOT `require` `$b` directly. */
     public function mustNotRequire(string $a, string $b, ?string $because = null): self
     {

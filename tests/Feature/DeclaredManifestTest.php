@@ -31,6 +31,9 @@ function declaredVendorTree(array $packages): string
         if (! empty($spec['require'])) {
             $manifest['require'] = (object) $spec['require'];
         }
+        if (! empty($spec['require-dev'])) {
+            $manifest['require-dev'] = (object) $spec['require-dev'];
+        }
         if (! empty($spec['topology'])) {
             $manifest['extra'] = ['package-topology' => $spec['topology']];
         }
@@ -69,6 +72,42 @@ test('a declared mustRequire that holds passes, and its absence is caught', func
     $violations = evaluateDeclared($bad);
     expect($violations)->not->toBe([])
         ->and($violations[0]->kind)->toBe(RuleKind::RequiredDirectEdge);
+});
+
+test('a declared mustRequireDev asserts the edge in require-dev — present passes, absent (or runtime-only) is caught', function () {
+    // beam declares "I require surgeon as DEV tooling" — and actually has it in require-dev.
+    $ok = declaredVendorTree([
+        'splicewire/laravel-beam' => [
+            'require-dev' => ['rushing/laravel-surgeon' => '*'],
+            'topology' => ['mustRequireDev' => ['rushing/laravel-surgeon']],
+        ],
+        'rushing/laravel-surgeon' => [],
+    ]);
+    expect(evaluateDeclared($ok))->toBe([]);
+
+    // Absent from require-dev entirely — caught.
+    $missing = declaredVendorTree([
+        'splicewire/laravel-beam-nodev' => [
+            'topology' => ['mustRequireDev' => ['rushing/laravel-surgeon']],
+        ],
+        'rushing/laravel-surgeon' => [],
+    ]);
+    $violations = evaluateDeclared($missing);
+    expect($violations)->not->toBe([])
+        ->and($violations[0]->kind)->toBe(RuleKind::RequiredDevDirectEdge)
+        ->and($violations[0]->message())->toContain('rushing/laravel-surgeon');
+
+    // In runtime `require` but NOT `require-dev` — still caught (the dev edge IS the contract).
+    $runtimeOnly = declaredVendorTree([
+        'splicewire/laravel-beam-runtime' => [
+            'require' => ['rushing/laravel-surgeon' => '*'],
+            'topology' => ['mustRequireDev' => ['rushing/laravel-surgeon']],
+        ],
+        'rushing/laravel-surgeon' => [],
+    ]);
+    $violations = evaluateDeclared($runtimeOnly);
+    expect($violations)->not->toBe([])
+        ->and($violations[0]->kind)->toBe(RuleKind::RequiredDevDirectEdge);
 });
 
 test('a declared mustNotRequire glob expands against the installed set and catches a violation', function () {
