@@ -1,9 +1,9 @@
-# laravel-package-topology
+# php-package-topology
 
 A declarative **package-topology substrate** for Laravel monorepos. Declare a repo's architecture as one
 `TopologyContract` and assert it holds — instead of hand-rolling an architectural-fitness test per rule.
 
-It **rides [`rushing/laravel-graphine`](https://github.com/stephenr85/laravel-graphine)**: a package-require
+It **rides [`rushing/php-graphine`](https://github.com/stephenr85/php-graphine)**: a package-require
 graph *is* a graph (nodes = packages, edges = requires), so the checks are graphine queries, not bespoke
 scans. Nothing Splicewire-specific lives here — it reads *your* `vendor/` and *your* `src/`.
 
@@ -25,10 +25,10 @@ tree.**
 ## Install
 
 ```bash
-composer require --dev rushing/laravel-package-topology
+composer require --dev rushing/php-package-topology
 ```
 
-Requires PHP ^8.3, `rushing/laravel-graphine`, and `galbar/jsonpath` (php-only, Apache-2.0 — the engine
+Requires PHP ^8.3, `rushing/php-graphine`, and `galbar/jsonpath` (php-only, Apache-2.0 — the engine
 behind `PackageJsonQuery`). The source-import axis needs a `nikic/php-parser`-providing
 host (suggest-only); the testing kit needs PHPUnit.
 
