@@ -1,0 +1,5 @@
+{
+    "name": "rushing/lib",
+    "require": {},
+    "extra": { "branch-alias": { "dev-main": "1.x-dev" } }
+}

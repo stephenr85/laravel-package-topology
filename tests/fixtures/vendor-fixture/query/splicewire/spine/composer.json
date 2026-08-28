@@ -1,0 +1,5 @@
+{
+    "name": "splicewire/spine",
+    "require": { "php": "^8.3" },
+    "extra": { "laravel": { "providers": ["Fixture\\Spine\\SpineServiceProvider"] } }
+}

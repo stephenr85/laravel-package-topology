@@ -1,0 +1,5 @@
+{
+    "name": "splicewire/beam-calendars",
+    "require": { "splicewire/spine": "*" },
+    "extra": { "laravel": { "providers": ["Fixture\\Beam\\BeamCalendarsServiceProvider"] } }
+}

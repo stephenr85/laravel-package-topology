@@ -28,7 +28,8 @@ tree.**
 composer require --dev rushing/laravel-package-topology
 ```
 
-Requires PHP ^8.3 and `rushing/laravel-graphine`. The source-import axis needs a `nikic/php-parser`-providing
+Requires PHP ^8.3, `rushing/laravel-graphine`, and `galbar/jsonpath` (php-only, Apache-2.0 — the engine
+behind `PackageJsonQuery`). The source-import axis needs a `nikic/php-parser`-providing
 host (suggest-only); the testing kit needs PHPUnit.
 
 ## Usage
@@ -139,6 +140,55 @@ its edge is *kept*, so `mustNotRequire` and `mustBeInstalled` still fire against
 dependency is a finding). A `sourceNeverReferences` rule whose package has no `src/` is skipped gracefully,
 not failed.
 
+## Package-JSON query — one JSONPath across every installed package, in dependency order
+
+The two axes above *check* a topology. `PackageJsonQuery` *reads* against it: run one expression over every
+in-scope package's JSON and get the answers back ordered by the require graph, requirements first.
+
+```php
+use Rushing\PackageTopology\Query\PackageJsonQuery;
+
+$q = new PackageJsonQuery(base_path('vendor'));
+
+$q->query('$.extra.laravel.providers');              // default file: composer.json
+$q->query('$.name', file: 'package.json');           // any file in the package root
+$q->query(fn (array $json): array => …);             // passthrough, when a path won't do
+
+$q->queryByPackage('$.extra.laravel.providers');     // same answers, keyed by package, same order
+$q->orderedPackages();                               // just the ordering
+```
+
+**The JSONPath is the CALLER's vocabulary, not this package's.** `$.extra.laravel.providers` is a *composer*
+convention that a *caller* happens to care about — nothing here knows what a service provider is, and nothing
+here ever will. That is why this is a path query and not a `providers()` method: the moment the key is spelled
+inside the package, the package has a framework, and this one requires only `php`, `rushing/php-graphine` and
+`galbar/jsonpath` (php-only, Apache-2.0) on purpose. Spell Laravel at the call site.
+
+**The ordering is the part nothing else can supply.** A read of `installed.json`, a `glob()` over `vendor/`, or
+a `ksort()` of package names all answer *which* packages and none of them answer *in what order* — composer's
+file order is not dependency order. Here it falls out of the require graph `ComposerManifestGraphSource`
+already builds: Kahn's sort over the **reversed** edge set, so for a `require` edge `a → b` the dependency `b`
+is emitted before its dependent `a`.
+
+| | returns | when |
+|---|---|---|
+| `query($path, $file)` | `list<mixed>` — flat, dependency-ordered, de-duplicated (first contributor wins) | you want the values |
+| `queryByPackage($path, $file)` | `array<string, list<mixed>>` — same order, insertion-ordered | you want provenance too |
+| `orderedPackages()` | `list<string>` | you only want the order |
+
+A match that is itself a list is **spread one level** (`$.extra.laravel.providers` matches one value which is an
+array of class names; you want the class names). Anything else is appended whole.
+
+**A package that does not answer is absent, never an error.** No such file, unreadable JSON, path selecting
+nothing — the package simply contributes nothing. That is the common case, not the edge: ask a real vendor tree
+for `$.extra.laravel.providers` and most packages have no `extra` block at all. A malformed *path* does raise —
+that is a fact about the caller's expression, not about any package.
+
+**Cyclic packages are appended, never dropped.** Kahn excludes nodes in or behind a cycle; inheriting that would
+make a require cycle present as a *shorter answer* rather than as a problem. They are appended in scope order
+instead, so the result stays complete and merely stops being fully ordered. `mustBeAcyclic()` is how you learn a
+cycle exists.
+
 ## How it works
 
 `ComposerManifestGraphSource` (a graphine `GraphSource`) reads the scoped manifests into `Node`/`Edge`;
@@ -146,6 +196,11 @@ not failed.
 `TopologyEvaluator` answers every rule from that snapshot — direct edges via bounded `neighbours`,
 reachability via `shortestPath`, cycles via `detectCycles`, and source rules via `SeamGuard`. Returns legible
 `TopologyViolation`s (which rule, which edge/file, the `because`); an empty list means the contract holds.
+
+`PackageJsonQuery` rides the same source — it takes the package set and the require edges from
+`ComposerManifestGraphSource` (never a second manifest walker of its own), orders them with graphine's
+`TopologicalSort::kahn()` over the reversed edges, then reads `vendor/{pkg}/{file}` per package and evaluates
+the caller's expression with `galbar/jsonpath`.
 
 ## Teeth
 

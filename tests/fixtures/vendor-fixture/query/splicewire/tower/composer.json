@@ -1,0 +1,12 @@
+{
+    "name": "splicewire/tower",
+    "require": { "splicewire/beam-calendars": "*", "rushing/lib": "*", "illuminate/support": "^12.0" },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Fixture\\Tower\\TowerCalendarsServiceProvider",
+                "Fixture\\Tower\\TowerServiceProvider"
+            ]
+        }
+    }
+}
